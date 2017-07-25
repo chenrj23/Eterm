@@ -8,7 +8,6 @@ import win32gui
 import win32api
 import win32con
 from time import sleep
-#参考页面 http://blog.csdn.net/fallinlovelj/article/details/54343520;http://blog.csdn.net/suzyu12345/article/details/52934328
 
 class OpenEterm():
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
@@ -22,8 +21,10 @@ class OpenEterm():
         os.startfile("C:\Program Files (x86)\Travelsky\eTerm3\eTerm3.exe")
         sleep(0.05)
         # 获取窗口句柄
-        windowName = "eTerm"
+        windowName = "eTerm 3 -pek3.eterm.com.cn (Direct) - [SESSION 1]"
         self.eterm = win32gui.FindWindow(None,windowName)
+        # 将窗口提到顶部
+        win32gui.SetForegroundWindow(self.eterm)
         print self.eterm
 
         sleep(0.05)
@@ -614,12 +615,17 @@ def typer(string=None,*args):
 eterm = OpenEterm()
 eterm.OpenEterm()
 
-typer('flp j/y87561/./1sep/szxhet')
+typer('flp:j/y87561/./1sep/szxhet')
 press('F12')
-sleep(0.5)
+sleep(1)
 typer('pn')
 press('F12')
-sleep(0.5)
+print "pn 1"
+sleep(1)
 typer('pn')
 press('F12')
-sleep(0.5)
+print "pn 2"
+sleep(1)
+typer('pn')
+press('F12')
+print "pn 3"
