@@ -30,8 +30,14 @@ class Page():
         print 'cleanTokens: ', cleanTokens
 
 
+class SyntaxParse():
+    def __init__(self, pagesList):
+        self.orderList = []
+        for  page in pagesList:
+            self.orderList.append(page.order)
+
 # fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
-fo = open("D:\\2017_07_25.log", "rb")
+fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
 str = fo.read();
 pages = str.split('\r\n\r\n')[:-1]
 pagesArray = []
@@ -52,6 +58,7 @@ for page in pagesArray:
     print 'page parseFLPJ: ', page.parseFLPJ()
     print ' '
 
+print 'order list: ',  SyntaxParse(pagesArray).orderList
 # print pagesArray[1].order
 # pagesArray[1].parseOrder()
 # print pagesArray[1].func
