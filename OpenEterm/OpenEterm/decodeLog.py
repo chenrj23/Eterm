@@ -1,21 +1,17 @@
 #-*- coding: UTF-8 -*-
 
 class Page():
-    def __init__(self, pageLines):
-        self.lines = pageLines
-        # try:
+    def __init__(self, rawPage):
+        self.rawPage = rawPage
+        self.lines = self.rawPage.split('\r\n')
         self.logTime = self.lines[0]
         self.order = self.lines[2][1:]
-        content = self.lines[3:]
-        self.body = [ content[i].split() for  i in range(len(content))]
+        self.content = self.lines[3:]
+        self.tokens = []
         self.parseOrder()
-        # except Exception as e:
-        #     print 'page lines not enough, lines: ', self.lines
-            # raise Exception("lines no long enough", self.lines)
 
-
-    def  __str__(self):
-        return self.order
+        for line in self.content:
+            self.tokens += line.split()
 
     def  __repr__(self):
         return self.order
@@ -29,12 +25,27 @@ class Page():
             self.func = self.order
             self.paras = []
 
-    def getTokens(self):
-        return self.body[:]
+    def getRawPage(self):
+        return self.rawPage
 
-    def parseFLPJ(self):
-        cleanTokens = filter(None, self.getTokens())
-        print 'cleanTokens: ', cleanTokens
+    def getLines(self):
+        return self.lines[:]
+
+    def getContent(self):
+        return self.content[:]
+
+    def getFunc(self):
+        return self.func
+
+    def getParas(self):
+        return self.paras.split('/')[:]
+
+    def getTokens(self):
+        return self.tokens[:]
+
+    # def parseFLPJ(self):
+    #     cleanTokens = filter(None, self.getTokens())
+    #     print 'cleanTokens: ', cleanTokens
 
 
 class SyntaxParse():
@@ -63,35 +74,36 @@ class SyntaxParse():
             package.content += page.cleanTokens
 
 # fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
-fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
+fo = open("D:\\2017_07_25.log", "rb")
 str = fo.read();
 pages = str.split('\r\n\r\n')[:-1]
 pagesArray = []
 print "pages length : ", len(str)
 for pageIndex in range(len(pages)):
     print '第%d页'%(pageIndex)
-    lines = pages[pageIndex].split('\r\n')
-    pagesArray.append(Page(lines))
+    page = Page(pages[pageIndex])
+    print 'It\'s tokens: ',page.getTokens()
+    pagesArray.append(page)
 fo.close()
 
-
-for page in pagesArray:
-    print 'page logTime: ', page.logTime
-    print 'page order: ', page.order
-    print 'page func: ', page.func
-    print 'page paras: ', page.paras
-    print 'page body: ', page.body
-    print 'page parseFLPJ: ', page.parseFLPJ()
-    print ' '
-
-syntaxPages = SyntaxParse(pagesArray)
-syntaxPages.package()
-print 'func list: ',  syntaxPages.funcList
-packages = syntaxPages.getPackages()
-print 'package list: ',  packages
-
-syntaxPages.parseFLPJ(packages[0])
-print 'packages[0] content: ', packages[0].content
+#
+# for page in pagesArray:
+#     print 'page logTime: ', page.logTime
+#     print 'page order: ', page.order
+#     print 'page func: ', page.func
+#     print 'page paras: ', page.paras
+#     print 'page body: ', page.body
+#     print 'page parseFLPJ: ', page.parseFLPJ()
+#     print ' '
+#
+# syntaxPages = SyntaxParse(pagesArray)
+# syntaxPages.package()
+# print 'func list: ',  syntaxPages.funcList
+# packages = syntaxPages.getPackages()
+# print 'package list: ',  packages
+#
+# syntaxPages.parseFLPJ(packages[0])
+# print 'packages[0] content: ', packages[0].content
 
 # print pagesArray[1].order
 # pagesArray[1].parseOrder()
