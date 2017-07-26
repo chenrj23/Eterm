@@ -13,6 +13,13 @@ class Page():
         #     print 'page lines not enough, lines: ', self.lines
             # raise Exception("lines no long enough", self.lines)
 
+
+    def  __str__(self):
+        return self.order
+
+    def  __repr__(self):
+        return self.order
+
     def parseOrder(self):
         try:
             self.func , self.paras= self.order.split(':')
@@ -32,9 +39,28 @@ class Page():
 
 class SyntaxParse():
     def __init__(self, pagesList):
-        self.orderList = []
+        self.funcList = []
         for  page in pagesList:
-            self.orderList.append(page.order)
+            self.funcList.append(page.order)
+
+    def package(self):
+        self.packagelist = []
+        indexStart = indexEnd = 0
+        for funcIndex in range(len(self.funcList)):
+            if funcIndex == 0:
+                continue
+            if self.funcList[funcIndex] != 'pn' or funcIndex == len(self.funcList)-1:
+                indexEnd = funcIndex
+                self.packagelist.append(pagesArray[indexStart:indexEnd])
+                indexStart = indexEnd
+
+    def  getPackages(self):
+        return self.packagelist[:]
+
+    def  parseFLPJ(self, package):
+        package.content = []
+        for page in package:
+            package.content += page.cleanTokens
 
 # fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
 fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
@@ -58,7 +84,15 @@ for page in pagesArray:
     print 'page parseFLPJ: ', page.parseFLPJ()
     print ' '
 
-print 'order list: ',  SyntaxParse(pagesArray).orderList
+syntaxPages = SyntaxParse(pagesArray)
+syntaxPages.package()
+print 'func list: ',  syntaxPages.funcList
+packages = syntaxPages.getPackages()
+print 'package list: ',  packages
+
+syntaxPages.parseFLPJ(packages[0])
+print 'packages[0] content: ', packages[0].content
+
 # print pagesArray[1].order
 # pagesArray[1].parseOrder()
 # print pagesArray[1].func
