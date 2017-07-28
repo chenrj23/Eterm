@@ -1,5 +1,5 @@
 #-*- coding: UTF-8 -*-
-
+import datetime
 class Page():
     def __init__(self, rawPage):
         self.rawPage = rawPage
@@ -43,38 +43,130 @@ class Page():
     def getTokens(self):
         return self.tokens[:]
 
-    # def parseFLPJ(self):
-    #     cleanTokens = filter(None, self.getTokens())
-    #     print 'cleanTokens: ', cleanTokens
+class Syntax():
 
-
-class SyntaxParse():
     def __init__(self, pagesList):
+        self.pagesList = pagesList
         self.funcList = []
         for  page in pagesList:
-            self.funcList.append(page.order)
+            self.funcList.append(page.getFunc())
+        self.scanPages()
 
-    def package(self):
-        self.packagelist = []
+    def getPagesList(self):
+        return self.pagesList[:]
+
+    def scanPages(self):
+        self.termList = []
         indexStart = indexEnd = 0
         for funcIndex in range(len(self.funcList)):
             if funcIndex == 0:
                 continue
             if self.funcList[funcIndex] != 'pn' or funcIndex == len(self.funcList)-1:
                 indexEnd = funcIndex
-                self.packagelist.append(pagesArray[indexStart:indexEnd])
+                if self.funcList[indexStart] == 'flp':
+                    term = Flp(pagesArray[indexStart:indexEnd])
+                else:
+                    raise Exception('unknow func', self.funcList[indexStart])
+                self.termList.append(term)
                 indexStart = indexEnd
 
-    def  getPackages(self):
-        return self.packagelist[:]
+    def  getTerms(self):
+        return self.termList[:]
 
-    def  parseFLPJ(self, package):
-        package.content = []
-        for page in package:
-            package.content += page.cleanTokens
+class Term():
+    def __init__(self, pagesList):
+        self.name = pagesList[0].getFunc()
+        self.tokens = []
+        for page in pagesList:
+            self.tokens += page.getTokens()
 
-# fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
-fo = open("D:\\2017_07_25.log", "rb")
+    def __repr__(self):
+        return self.name
+
+    def getTokens(self):
+        return self.tokens[:]
+
+class Flp(Term):
+    """docstring for Flp."""
+    def __init__(self, pagesList):
+        Term.__init__(self,pagesList)
+        # super(Flp, self).__init__()
+        self.tokens = [] #rewrite Term
+        endIndex = 0
+        for page in pagesList:
+            pageContent = page.getContent()
+            for line in pageContent[2:]:
+                self.tokens += line.split()
+        for index in range(len(self.tokens)):
+            if self.tokens[index] == 'FLIGHT':
+                endIndex = index
+        self.tokens = self.tokens[:endIndex]
+
+    def parasParse(self):
+        self.
+
+class Flight():
+    def __init__(self,flightNo, flightDate):
+        self.flightNo = flightNo
+        self.flightDate = flightDate
+        self.booked = {
+        'C': 0,
+        'D': 0,
+        'I': 0,
+        'J': 0,
+        'Y': 0,
+        'B': 0,
+        'H': 0,
+        'K': 0,
+        'L': 0,
+        'M': 0,
+        'Q': 0,
+        'X': 0,
+        'U': 0,
+        'E': 0,
+        'N': 0,
+        'T': 0,
+        'R': 0,
+        'W': 0,
+        'V': 0,
+        'G': 0,
+        '0': 0,
+        'S': 0,
+        }
+
+    def __repr__(self):
+        return self.flightNo + ':' +　self.flightDate
+
+    def setBooked(self, cabin, number):
+        try:
+            self.booked[cabin] = number
+        except Exception as e:
+            raise e
+
+def dateParse(token):
+    date = ''
+    try:
+        # print(token[0:4])
+        date = datetime.datetime.strptime(token[0:5], "%d%b")
+    except ValueError as e:
+        pass
+    if date:
+        print 'date is :', date
+
+def  progressParse(token):
+    if token == '%':
+        return True
+    else:
+        return False
+
+def bookedParse(token):
+    splitedToken = token.split('/')
+    if len(splitedToken) > 5:
+        for fragment in splitedToken:
+            flight = Flight()
+
+fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_21.log", "rb")
+# fo = open("D:\\2017_07_25.log", "rb")
 str = fo.read();
 pages = str.split('\r\n\r\n')[:-1]
 pagesArray = []
@@ -82,30 +174,19 @@ print "pages length : ", len(str)
 for pageIndex in range(len(pages)):
     print '第%d页'%(pageIndex)
     page = Page(pages[pageIndex])
-    print 'It\'s tokens: ',page.getTokens()
+    # print 'It\'s tokens: ',page.getTokens()
     pagesArray.append(page)
 fo.close()
 
-#
-# for page in pagesArray:
-#     print 'page logTime: ', page.logTime
-#     print 'page order: ', page.order
-#     print 'page func: ', page.func
-#     print 'page paras: ', page.paras
-#     print 'page body: ', page.body
-#     print 'page parseFLPJ: ', page.parseFLPJ()
-#     print ' '
-#
-# syntaxPages = SyntaxParse(pagesArray)
-# syntaxPages.package()
-# print 'func list: ',  syntaxPages.funcList
-# packages = syntaxPages.getPackages()
-# print 'package list: ',  packages
-#
-# syntaxPages.parseFLPJ(packages[0])
-# print 'packages[0] content: ', packages[0].content
+syntax = Syntax(pagesArray)
+terms = syntax.getTerms()
+pagesArray[0].getContent
+print 'page0 content: ', pagesArray[0].getContent()
+print 'term0: ', terms[0].getTokens()
 
-# print pagesArray[1].order
-# pagesArray[1].parseOrder()
-# print pagesArray[1].func
-# print pagesArray[1].paras
+tokens = terms[0].getTokens()
+for index,token in enumerate(tokens):
+    dateParse(token)
+    if progressParse(token):
+        print tokens[index-1],"%"
+#
