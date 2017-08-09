@@ -386,20 +386,12 @@ def typer(string=None,*args):
             win32api.keybd_event(VK_CODE['left_shift'],0 ,win32con.KEYEVENTF_KEYUP ,0)
             win32api.keybd_event(VK_CODE['-'],0 ,win32con.KEYEVENTF_KEYUP ,0)
 
-
-        # elif i == '=':
-        #     win32api.keybd_event(VK_CODE['left_shift'], 0,0,0)
-        #     win32api.keybd_event(VK_CODE['+'], 0,0,0)
-        #     time.sleep(.05)
-        #     win32api.keybd_event(VK_CODE['left_shift'],0 ,win32con.KEYEVENTF_KEYUP ,0)
-        #     win32api.keybd_event(VK_CODE['+'],0 ,win32con.KEYEVENTF_KEYUP ,0)
-
         elif i == '+':
             win32api.keybd_event(VK_CODE['left_shift'], 0,0,0)
-            win32api.keybd_event(VK_CODE['+'], 0,0,0)
+            win32api.keybd_event(VK_CODE['='], 0,0,0)
             time.sleep(.05)
             win32api.keybd_event(VK_CODE['left_shift'],0 ,win32con.KEYEVENTF_KEYUP ,0)
-            win32api.keybd_event(VK_CODE['+'],0 ,win32con.KEYEVENTF_KEYUP ,0)
+            win32api.keybd_event(VK_CODE['='],0 ,win32con.KEYEVENTF_KEYUP ,0)
 
         elif i == '~':
             win32api.keybd_event(VK_CODE['left_shift'], 0,0,0)
@@ -611,46 +603,62 @@ def typer(string=None,*args):
             win32api.keybd_event(VK_CODE[i],0 ,win32con.KEYEVENTF_KEYUP ,0)
 
 
+if __name__ == '__main__':
+    eterm = OpenEterm()
+    eterm.OpenEterm()
+    fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_27.log", "rb")
 
-eterm = OpenEterm()
-eterm.OpenEterm()
+    typer('flp:j/y87561/./12sep/szxhet')
+    press('F12')
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 1"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 2"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 3"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 4"
 
-typer('flp:j/y87561/./12sep/szxhet')
-press('F12')
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 1"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 2"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 3"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 4"
+    sleep(1)
 
-sleep(1)
+    str = fo.read();
+    position = fo.tell();
+    print "当前文件位置 : ", position
+    print "当前文件内容 : ", str
+    fo.close()
 
-typer('flp:j/y87561/./12sep/hethld')
-press('F12')
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 1"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 2"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 3"
-sleep(1)
-typer('pn')
-press('F12')
-print "pn 4"
+
+    typer('flp:j/y87561/./12sep/hethld')
+    press('F12')
+    sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 1"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 2"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 3"
+    # sleep(1)
+    # typer('pn')
+    # press('F12')
+    # print "pn 4"
+
+    fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_27.log", "rb")
+    fo.seek(position, 0)
+    str = fo.read();
+    position = fo.tell();
+    print "当前文件位置 : ", position
+    print "当前文件内容 : ", str
+    fo.close()

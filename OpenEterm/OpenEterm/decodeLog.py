@@ -1,5 +1,37 @@
 #-*- coding: UTF-8 -*-
-import datetime
+import datetime, copy
+
+class Decode():
+    def __init__(self, filePath, startPosition = 0):
+        self.filePath = filePath
+        self.position = startPosition
+        self.terms = []
+        pass
+
+    def next(self):
+        fo = open(self.filePath, "rb")
+        fo.seek(self.position, 0)
+        str = fo.read()
+        self.position = fo.tell();
+        fo.close()
+
+        pages = Pages(str)
+        pagesList = pages.getPagesList()
+        syntax = Syntax(pagesList)
+        self.terms = syntax.getTerms()
+
+    def getTerms(self):
+        return self.terms[:]
+
+class Pages():
+    def __init__(self, rawStr):
+        self.rawStr = rawStr
+        self.splitStr = rawStr.split('\r\n\r\n')[:-1]
+        self.pagesList = [Page(pageStr) for pageStr in self.splitStr ]
+
+    def getPagesList(self):
+        return self.pagesList[:]
+
 class Page():
     def __init__(self, rawPage):
         self.rawPage = rawPage
@@ -70,7 +102,7 @@ class Syntax():
             if self.funcList[funcIndex] != 'pn':
                 indexEnd = funcIndex
                 if self.funcList[indexStart] == 'flp':
-                    term = Flp(pagesArray[indexStart:indexEnd])
+                    term = Flp(self.pagesList[indexStart:indexEnd])
                 else:
                     raise Exception('unknow func', self.funcList[indexStart])
                 self.termList.append(term)
@@ -104,6 +136,7 @@ class Flp(Term):
         self.tokens = [] #rewrite Term
         self.flightNo = ''
         self.route=''
+        self.flights = {}
         endIndex = 0
         for page in pagesList:
             pageContent = page.getContent()
@@ -112,8 +145,10 @@ class Flp(Term):
         for index in range(len(self.tokens)):
             if self.tokens[index] == 'FLIGHT':
                 endIndex = index
-        self.tokens = self.tokens[:endIndex]
+                self.tokens = self.tokens[:endIndex]
+                break
         self.parasParse()
+        self.tokenParse()
 
     def parasParse(self):
         self.flightNo = self.paras[1]
@@ -125,10 +160,33 @@ class Flp(Term):
     def getRoute(self):
         return self.route
 
+    def getFlights(self):
+        return copy.deepcopy(self.flights)
+
+    def tokenParse(self):
+        for index,token in enumerate(self.tokens):
+            parsedDate = dateParse(token)
+            bookedData = bookedParse(token)
+            if parsedDate:
+                # print parsedDate
+                flight = Flight(self.flightNo, parsedDate)
+                self.flights[flight] = flight
+                # print 'flight :', flight
+                # self.flight[flight]
+            if bookedData:
+                # print 'bookedData: ', bookedData
+                for (cabin, numb) in bookedData.items():
+                    flight.setBooked(cabin, numb)
+            if progressParse(token):
+                # print self.tokens[index-1],"%"
+                amount = int(self.tokens[index-1])
+                flight.setProgress(amount)
+
 class Flight():
     def __init__(self,flightNo, flightDate):
         self.flightNo = flightNo
         self.flightDate = flightDate
+        self.progress = 0
         self.booked = {
         'C': 0,
         'D': 0,
@@ -146,16 +204,21 @@ class Flight():
         'E': 0,
         'N': 0,
         'T': 0,
+        'V': 0,
         'R': 0,
         'W': 0,
-        'V': 0,
+        'P': 0,
         'G': 0,
-        '0': 0,
+        'O': 0,
         'S': 0,
         }
 
     def __repr__(self):
-        return self.flightNo + ':' + self.flightDate
+        return self.flightNo + '-' + self.flightDate.strftime('%d%b%y')
+
+    def setProgress(self, amount):
+        ``` amount is int ```
+        self.progress = amount
 
     def setBooked(self, cabin, number):
         try:
@@ -163,10 +226,23 @@ class Flight():
         except Exception as e:
             raise e
 
+    def getFlightNo(self):
+        return self.flightNo
+
+    def getFlightDate(self):
+        return self.flightDate
+
+    def getBooked(self):
+        return self.booked
+
+    def getProgress(self):
+        return self.progress
+
 def dateParse(token):
     date = ''
     try:
         date = datetime.datetime.strptime(token[0:5], "%d%b")
+        date = date.replace(date.today().year).date()
     except ValueError as e:
         pass
         # raise e
@@ -175,7 +251,7 @@ def dateParse(token):
     else:
         return False
 
-def  progressParse(token):
+def progressParse(token):
     if token == '%':
         return True
     else:
@@ -188,45 +264,15 @@ def bookedParse(token):
     if len(splitedToken) >= 3:
         for fragment in splitedToken:
             cabin = fragment[0]
-            numb = fragment[1]
+            numb = fragment[1:]
             bookedData[cabin] = numb
 
     return bookedData
-
-fo = open("D:\\iCloudDrive\\officeDesktop\\test.log", "rb")
-# fo = open("D:\\2017_07_25.log", "rb")
-str = fo.read();
-pages = str.split('\r\n\r\n')[:-1]
-pagesArray = []
-print "pages length : ", len(pages)
-for pageIndex in range(len(pages)):
-    print '第%d页'%(pageIndex)
-    page = Page(pages[pageIndex])
-    # print 'It\'s tokens: ',page.getTokens()
-    pagesArray.append(page)
-fo.close()
-
-syntax = Syntax(pagesArray)
-print 'funcList: ', syntax.funcList
-terms = syntax.getTerms()
-print 'term: ', terms
-
-flights = []
-
-for term in terms:
-    print 'term flightNo: ', term.getFlightNo()
-    print 'term Route: ', term.getRoute()
-    # print 'term Tokens: ', term.getTokens()
-    tokens = term.getTokens()
-    # print 'term pagesList: ', term.getPagesList()
-    for index,token in enumerate(tokens):
-        parsedDate = dateParse(token)
-        bookedData = bookedParse(token)
-        if parsedDate:
-            print parsedDate
-            flight = Flight(term.getFlightNo, parsedDate)
-        if bookedData:
-            print 'bookedData: ', bookedData
-        if progressParse(token):
-            print tokens[index-1],"%"
-#
+if __name__ == '__main__':
+    decode = Decode("../../test.log")
+    decode.next()
+    terms = decode.getTerms()
+    for term in terms:
+        flights = term.getFlights()
+        print 'flights len: ',  len(flights)
+        print 'flights: ',  flights
