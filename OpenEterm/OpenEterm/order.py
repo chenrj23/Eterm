@@ -17,6 +17,7 @@ def flp(flightNo,startDate, endDate, route, option=''):
     if pnLong > 0:
         for pnNumb in range(pnLong):
             orders.append('pn')
+    return orders
     print 'dayLong: ', dayLong
     print 'pnLong: ', pnLong
     print 'orders: ', orders

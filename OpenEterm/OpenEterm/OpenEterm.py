@@ -610,22 +610,6 @@ if __name__ == '__main__':
 
     typer('flp:j/y87561/./12sep/szxhet')
     press('F12')
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 1"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 2"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 3"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 4"
 
     sleep(1)
 
@@ -639,21 +623,7 @@ if __name__ == '__main__':
     typer('flp:j/y87561/./12sep/hethld')
     press('F12')
     sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 1"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 2"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 3"
-    # sleep(1)
-    # typer('pn')
-    # press('F12')
-    # print "pn 4"
+
 
     fo = open("D:\\iCloudDrive\\officeDesktop\\2017_07_27.log", "rb")
     fo.seek(position, 0)

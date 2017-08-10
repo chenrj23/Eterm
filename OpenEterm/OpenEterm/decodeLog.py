@@ -1,12 +1,11 @@
 #-*- coding: UTF-8 -*-
-import datetime, copy
+import datetime, copy, time
 
 class Decode():
     def __init__(self, filePath, startPosition = 0):
         self.filePath = filePath
         self.position = startPosition
         self.terms = []
-        pass
 
     def next(self):
         fo = open(self.filePath, "rb")
@@ -36,7 +35,10 @@ class Page():
     def __init__(self, rawPage):
         self.rawPage = rawPage
         self.lines = self.rawPage.split('\r\n')
-        self.logTime = self.lines[0]
+        self.logTime = self.lines[0].split('\n')[-1]
+        self.logTime = time.strptime(self.logTime, "%Y %B %d, %A, %H:%M:%S")
+        print 'logTime ', self.logTime
+        # self.parseLog()
         self.content = self.lines[3:]
         self.order = ''
         self.tokens = []
@@ -117,6 +119,7 @@ class Term():
         self.paras = pagesList[0].getParas()
         self.pagesList = pagesList
         self.tokens = []
+        self.logTime = pagesList[0].logTime
         for page in pagesList:
             self.tokens += page.getTokens()
 
@@ -169,7 +172,7 @@ class Flp(Term):
             bookedData = bookedParse(token)
             if parsedDate:
                 # print parsedDate
-                flight = Flight(self.flightNo, parsedDate)
+                flight = Flight(self.flightNo, parsedDate, self.logTime)
                 self.flights[flight] = flight
                 # print 'flight :', flight
                 # self.flight[flight]
@@ -183,9 +186,10 @@ class Flp(Term):
                 flight.setProgress(amount)
 
 class Flight():
-    def __init__(self,flightNo, flightDate):
+    def __init__(self,flightNo, flightDate, logTime):
         self.flightNo = flightNo
         self.flightDate = flightDate
+        self.logTime = logTime
         self.progress = 0
         self.booked = {
         'C': 0,
@@ -269,7 +273,8 @@ def bookedParse(token):
 
     return bookedData
 if __name__ == '__main__':
-    decode = Decode("../../test.log")
+    decode = Decode("D:\\iCloudDrive\\officeDesktop\\2017_07_27.log")
+    # decode = Decode("../../test.log")
     decode.next()
     terms = decode.getTerms()
     for term in terms:
