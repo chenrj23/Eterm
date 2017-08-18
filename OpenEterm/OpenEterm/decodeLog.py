@@ -2,12 +2,14 @@
 import datetime, copy, time, MySQLdb
 from collections import OrderedDict
 
+dbPassword = raw_input("please write you DB password: ");
+
 class DB:
     conn = None
 
     def connect(self):
         self.conn = MySQLdb.connect(
-            "120.27.5.155", "root", "y8kyscsy", "eterm")
+            "120.27.5.155", "root",dbPassword, "eterm")
         self.conn.autocommit(True)
 
     def execute(self, sql):
